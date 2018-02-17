@@ -11,24 +11,23 @@ var input = process.argv[3];
 
 
 // LIRI.js my-tweets - shows the last 3 tweets and time
-function tweetIt() {
-    var params = { count: "3" };
-    var tweetNum = 1;
-    twitterClient.get('statuses/user_timeline', params, function (error, tweets, response) {
+function displaytweets() {
+    var count = { count: "3" };
+    var tweet = 1;
+    twitterClient.get('statuses/user_timeline', count, function (error, tweets, response) {
         if (!error) {
             for (var i = 0; i < tweets.length; i++) {
            
-                console.log("Tweet== " + tweetNum + ": " + tweets[i].text + "\n ----> Tweeted at: " + tweets[i].created_at);
-                tweetNum++;
+                console.log("Tweet== " + tweet + ": " + tweets[i].text + "\n ----> Tweeted at: " + tweets[i].created_at);
+                tweet++;
             }
         }
     });
 }
 
 
-     //console.log(tweets[i]);
-
-function spotifyIt(spotifysong) {
+// LIRI.js spotify-this-song - spotifies a song
+function spotifythissong(spotifysong) {
     spotifysong = input;
     spotifyClient.search({ type: 'track', query: spotifysong }, function (err, data) {
         if (err) {
@@ -42,10 +41,11 @@ function spotifyIt(spotifysong) {
 
 }
 
-// liri.js movie-this + (movie name)
-function omdbIt() {
-    var movieSearch = function () {
-        request("http://www.omdbapi.com/?t=" + input + "=&plot=short&apikey=" + keys.omdbKeys, function (error, response, body) {
+// LIRI.js movie-this - Looks up a movie
+function omdbtitle() {
+    var Title;
+    var movielookup = function () {
+        request("http://www.omdbapi.com/?t=" + Title + "=&plot=short&apikey=" + keys.omdbKeys, function (error, response, body) {
             if (!error && response.statusCode === 200) {
                 console.log("Title: " + JSON.parse(body).Title);
                 console.log("Year released: " + JSON.parse(body).Year);
@@ -58,10 +58,20 @@ function omdbIt() {
             }
         });
     };
+    if (input === "") {
+        Title = "Mr. Nobody";
+        movieSearch();
+    }
+    else {
+        Title = input;
+        movielookup();
+
+    }
 }
 
 
-function doIt() {
+// LIRI.js do-what-it-says - Reads a file
+function readfile() {
     var fs = require("fs");
     fs.readFile("random.txt", "utf8", function (error, data) {
         if (error) {
@@ -71,26 +81,26 @@ function doIt() {
         var dataArr = data.split(",");
         var inputType = dataArr[0];
         input = dataArr[1];
-        spotifyIt();
+        spotifythissong();
     });
 }
 
 
 switch (inputType) {
     case "my-tweets":
-        tweetIt();
+        displaytweets();
         console.log("~~~~~my-tweets~~~~~");
         break;
     case "spotify-this-song":
-        spotifyIt();
+        spotifythissong();
         console.log("~~~~~spotify-this-song~~~~~");
         break;
     case "movie-this":
-        omdbIt();
+        omdbtitle();
         console.log("~~~~~Initializing OMDB Movie Lookup~~~~~");
         break;
     case "do-what-it-says":
-        doIt();
+        readfile();
         console.log("~~~~~Initializing Do what you say~~~~~");
         break;
     default:
